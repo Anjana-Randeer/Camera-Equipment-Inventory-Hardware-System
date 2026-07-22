@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard | CamRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .modal-glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); }
+        .category-card { 
+            background-size: cover; 
+            background-position: center; 
+            background-blend-mode: overlay;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col pb-12">
+
+    <!-- Navbar -->
+    <nav class="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xl font-bold tracking-tight text-white">CamRent <span class="font-light text-gray-400">Staff</span></span>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <button onclick="openModal('customerModal')" class="text-sm font-medium text-blue-400 hover:text-blue-300">Register Customer</button>
+                    <button onclick="openModal('checkoutModal')" class="text-sm font-medium text-emerald-400 hover:text-emerald-300">Checkout</button>
+                    <button onclick="openModal('checkinModal')" class="text-sm font-medium text-orange-400 hover:text-orange-300">Check-in</button>
+                    <div class="h-6 border-l border-gray-700"></div>
+                    <span class="text-sm text-gray-300">Hi, <span th:text="${staffName}" class="font-semibold text-white">Name</span></span>
+                    <a th:href="@{/logout}" class="text-gray-400 hover:text-white transition-colors text-sm font-medium">Log out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
+        
+        <h1 class="text-3xl font-bold text-white mb-2">Inventory Categories</h1>
+        <p class="text-gray-400 mb-8">Browse available equipment</p>
+
+        <!-- Category Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Cameras Card -->
+            <div class="category-card bg-gray-800 rounded-2xl p-6 cursor-pointer hover:ring-2 hover:ring-white/50 transition-all shadow-xl h-64 flex flex-col justify-end group"
+                 style="background-image: url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop');"
+                 onclick="toggleAccordion('acc-cameras')">
+                <div class="bg-black/60 p-4 rounded-xl backdrop-blur-sm group-hover:bg-black/40 transition-colors">
+                    <h2 class="text-2xl font-bold text-white">Cameras</h2>
+                    <p class="text-gray-300 text-sm mt-1" th:text="${#lists.size(cameras)} + ' Available'">0 Available</p>
+                </div>
+            </div>
+
+            <!-- Lenses Card -->
+            <div class="category-card bg-gray-800 rounded-2xl p-6 cursor-pointer hover:ring-2 hover:ring-white/50 transition-all shadow-xl h-64 flex flex-col justify-end group"
+                 style="background-image: url('https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=800&auto=format&fit=crop');"
+                 onclick="toggleAccordion('acc-lenses')">
+                <div class="bg-black/60 p-4 rounded-xl backdrop-blur-sm group-hover:bg-black/40 transition-colors">
+                    <h2 class="text-2xl font-bold text-white">Lenses</h2>
+                    <p class="text-gray-300 text-sm mt-1" th:text="${#lists.size(lenses)} + ' Available'">0 Available</p>
+                </div>
+            </div>
+
+            <!-- Accessories Card -->
+            <div class="category-card bg-gray-800 rounded-2xl p-6 cursor-pointer hover:ring-2 hover:ring-white/50 transition-all shadow-xl h-64 flex flex-col justify-end group"
+                 style="background-image: url('https://images.unsplash.com/photo-1502982720700-baf97d4251a6?q=80&w=800&auto=format&fit=crop');"
+                 onclick="toggleAccordion('acc-accessories')">
+                <div class="bg-black/60 p-4 rounded-xl backdrop-blur-sm group-hover:bg-black/40 transition-colors">
+                    <h2 class="text-2xl font-bold text-white">Accessories</h2>
+                    <p class="text-gray-300 text-sm mt-1" th:text="${#lists.size(accessories)} + ' Available'">0 Available</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Accordion Contents -->
+        
+        <!-- Cameras Accordion -->
+        <div id="acc-cameras" class="hidden opacity-0 transition-opacity duration-300 mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-800 pb-2">Available Cameras</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div th:each="cam : ${cameras}" class="bg-black/40 border border-gray-800 p-4 rounded-lg">
+                    <div class="text-xs text-gray-500 mb-1" th:text="${cam.brand}">Brand</div>
+                    <div class="font-semibold text-white" th:text="${cam.equipmentName}">Name</div>
+                    <div class="text-sm text-blue-400 mt-2">Rs. <span th:text="${cam.rentalPerDay}"></span>/day</div>
+                    <div class="text-xs text-gray-600 mt-1 font-mono" th:text="${cam.equipmentId}">ID</div>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(cameras)}" class="text-gray-500">No cameras available currently.</p>
+        </div>
+
+        <!-- Lenses Accordion -->
+        <div id="acc-lenses" class="hidden opacity-0 transition-opacity duration-300 mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-800 pb-2">Available Lenses</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div th:each="lens : ${lenses}" class="bg-black/40 border border-gray-800 p-4 rounded-lg">
+                    <div class="text-xs text-gray-500 mb-1" th:text="${lens.brand}">Brand</div>
+                    <div class="font-semibold text-white" th:text="${lens.equipmentName}">Name</div>
+                    <div class="text-sm text-blue-400 mt-2">Rs. <span th:text="${lens.rentalPerDay}"></span>/day</div>
+                    <div class="text-xs text-gray-600 mt-1 font-mono" th:text="${lens.equipmentId}">ID</div>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(lenses)}" class="text-gray-500">No lenses available currently.</p>
+        </div>
+
+        <!-- Accessories Accordion -->
+        <div id="acc-accessories" class="hidden opacity-0 transition-opacity duration-300 mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-800 pb-2">Available Accessories</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div th:each="acc : ${accessories}" class="bg-black/40 border border-gray-800 p-4 rounded-lg">
+                    <div class="text-xs text-gray-500 mb-1" th:text="${acc.brand}">Brand</div>
+                    <div class="font-semibold text-white" th:text="${acc.equipmentName}">Name</div>
+                    <div class="text-sm text-blue-400 mt-2">Rs. <span th:text="${acc.rentalPerDay}"></span>/day</div>
+                    <div class="text-xs text-gray-600 mt-1 font-mono" th:text="${acc.equipmentId}">ID</div>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(accessories)}" class="text-gray-500">No accessories available currently.</p>
+        </div>
+
+    </main>
+
+    <!-- Modal: Register Customer -->
+    <div id="customerModal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 modal-glass" onclick="closeModal('customerModal')"></div>
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md p-6 relative z-10 shadow-2xl transform scale-95 transition-transform duration-300">
+                <h2 class="text-xl font-bold text-white mb-6">Register Customer</h2>
+                <form th:action="@{/staff/customer/register}" method="post" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Customer ID</label>
+                        <input type="text" name="customerId" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Name</label>
+                        <input type="text" name="name" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">NIC No</label>
+                        <input type="text" name="nicNo" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Contact No</label>
+                        <input type="text" name="contactNo" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white">
+                    </div>
+                    <button type="submit" class="w-full bg-white text-black font-semibold py-2.5 rounded-lg mt-4 hover:bg-gray-200">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Checkout -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 modal-glass" onclick="closeModal('checkoutModal')"></div>
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg p-6 relative z-10 shadow-2xl transform scale-95 transition-transform duration-300">
+                <h2 class="text-xl font-bold text-white mb-6">Process Checkout</h2>
+                <form th:action="@{/staff/checkout}" method="post" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Customer ID</label>
+                        <input type="text" name="customerId" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-400" placeholder="e.g. C001">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Equipment IDs (comma separated)</label>
+                        <input type="text" name="equipmentIds" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-400" placeholder="e.g. CAM001, LEN002">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Rental Duration (Days)</label>
+                        <input type="number" name="days" required min="1" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-400" value="1">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500 text-black font-bold py-2.5 rounded-lg mt-4 hover:bg-emerald-400">Complete Checkout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Check-in -->
+    <div id="checkinModal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 modal-glass" onclick="closeModal('checkinModal')"></div>
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg p-6 relative z-10 shadow-2xl transform scale-95 transition-transform duration-300">
+                <h2 class="text-xl font-bold text-white mb-6">Process Check-in</h2>
+                <form th:action="@{/staff/checkin}" method="post" class="space-y-4">
+                    
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Transaction ID</label>
+                        <input type="text" name="transactionId" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-400" placeholder="TXN-XXXX">
+                    </div>
+                    
+                    <div class="bg-black/30 p-4 rounded-lg border border-gray-800">
+                        <label class="flex items-center space-x-3 cursor-pointer">
+                            <input type="checkbox" name="isDamaged" value="true" onchange="toggleDamageFields(this.checked)" class="w-4 h-4 bg-black border-gray-700 rounded text-orange-500 focus:ring-orange-500 focus:ring-offset-gray-900">
+                            <span class="text-sm font-medium text-white">Item Damaged?</span>
+                        </label>
+                        
+                        <div id="damageFields" class="hidden mt-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-red-400 mb-1">Issue Description</label>
+                                <textarea name="damageDescription" rows="2" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-red-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-red-400 mb-1">Estimated Cost (Rs.)</label>
+                                <input type="number" step="0.01" name="damageCost" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Payment Method</label>
+                        <select name="paymentMethod" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-400">
+                            <option value="CASH">Cash</option>
+                            <option value="CREDIT_CARD">Credit Card</option>
+                            <option value="BANK_TRANSFER">Bank Transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-800">
+                        <button type="submit" class="w-full bg-orange-500 text-black font-bold py-2.5 rounded-lg hover:bg-orange-400">Complete Return</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            const allAccs = ['acc-cameras', 'acc-lenses', 'acc-accessories'];
+            
+            // Hide others
+            allAccs.forEach(accId => {
+                if(accId !== id) {
+                    const acc = document.getElementById(accId);
+                    acc.classList.remove('opacity-100');
+                    acc.classList.add('opacity-0');
+                    setTimeout(() => acc.classList.add('hidden'), 300);
+                }
+            });
+
+            // Toggle target
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                setTimeout(() => {
+                    el.classList.remove('opacity-0');
+                    el.classList.add('opacity-100');
+                }, 10);
+            } else {
+                el.classList.remove('opacity-100');
+                el.classList.add('opacity-0');
+                setTimeout(() => el.classList.add('hidden'), 300);
+            }
+        }
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                modal.querySelector('.transform').classList.remove('scale-95');
+                modal.querySelector('.transform').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.remove('scale-100');
+            modal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function toggleDamageFields(isChecked) {
+            const fields = document.getElementById('damageFields');
+            if(isChecked) {
+                fields.classList.remove('hidden');
+            } else {
+                fields.classList.add('hidden');
+                // clear values
+                fields.querySelector('textarea').value = '';
+                fields.querySelector('input[type="number"]').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
