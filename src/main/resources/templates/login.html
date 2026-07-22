@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CamRent | Premium Gear</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center font-sans text-white antialiased">
+
+    <div class="glass w-full max-w-4xl mx-4 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative min-h-[600px]">
+        
+        <!-- Left Branding Panel -->
+        <div class="w-full md:w-1/2 p-12 flex flex-col justify-center relative overflow-hidden bg-gradient-to-br from-black/80 to-transparent">
+            <div class="z-10">
+                <h1 class="text-5xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">CamRent.</h1>
+                <p class="text-lg text-gray-300 font-light tracking-wide mb-8">Professional gear for the uncompromising creator. Elevate your craft today.</p>
+            </div>
+            
+            <!-- Abstract decorative circles -->
+            <div class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full border border-white/5 opacity-50"></div>
+            <div class="absolute -top-32 -right-32 w-64 h-64 rounded-full border border-white/10 opacity-30"></div>
+        </div>
+
+        <!-- Right Forms Panel -->
+        <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
+            
+            <!-- Toggle Buttons -->
+            <div class="flex space-x-4 mb-8 border-b border-gray-600/50 pb-2">
+                <button id="btn-login" class="text-white font-semibold border-b-2 border-white pb-2 px-2 transition-all duration-300" onclick="switchTab('login')">Sign In</button>
+                <button id="btn-signup" class="text-gray-400 font-semibold border-b-2 border-transparent pb-2 px-2 transition-all duration-300 hover:text-white" onclick="switchTab('signup')">Staff Registration</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="form-login" class="transition-opacity duration-500 ease-in-out opacity-100">
+                <h2 class="text-3xl font-bold mb-6">Welcome Back</h2>
+                
+                <div th:if="${error}" class="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-lg mb-6 text-sm">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <form th:action="@{/login}" method="post" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                        <input type="email" name="email" required class="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-colors text-white placeholder-gray-500" placeholder="admin@camrent.lk">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <input type="password" name="password" required class="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-colors text-white placeholder-gray-500" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors mt-4">Sign In</button>
+                </form>
+            </div>
+
+            <!-- Signup Form (Hidden by default) -->
+            <div id="form-signup" class="hidden transition-opacity duration-500 ease-in-out opacity-0">
+                <h2 class="text-3xl font-bold mb-6">Join the Team</h2>
+                <form th:action="@{/signup}" th:object="${staff}" method="post" class="space-y-4">
+                    
+                    <div class="flex space-x-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Staff ID</label>
+                            <input type="text" th:field="*{userId}" required class="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-white transition-colors text-white placeholder-gray-500" placeholder="S001">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                            <input type="text" th:field="*{name}" required class="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-white transition-colors text-white placeholder-gray-500" placeholder="John Doe">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                        <input type="email" th:field="*{email}" required class="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-white transition-colors text-white placeholder-gray-500" placeholder="john@camrent.lk">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Contact No</label>
+                        <input type="text" th:field="*{contactNo}" class="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-white transition-colors text-white placeholder-gray-500" placeholder="077xxxxxxx">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <input type="password" th:field="*{password}" required class="w-full bg-black/40 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-white transition-colors text-white placeholder-gray-500" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors mt-4">Create Account</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const signupForm = document.getElementById('form-signup');
+            const btnLogin = document.getElementById('btn-login');
+            const btnSignup = document.getElementById('btn-signup');
+
+            if (tab === 'login') {
+                btnLogin.classList.replace('text-gray-400', 'text-white');
+                btnLogin.classList.replace('border-transparent', 'border-white');
+                btnSignup.classList.replace('text-white', 'text-gray-400');
+                btnSignup.classList.replace('border-white', 'border-transparent');
+                
+                signupForm.classList.remove('opacity-100');
+                signupForm.classList.add('opacity-0');
+                setTimeout(() => {
+                    signupForm.classList.add('hidden');
+                    loginForm.classList.remove('hidden');
+                    setTimeout(() => {
+                        loginForm.classList.remove('opacity-0');
+                        loginForm.classList.add('opacity-100');
+                    }, 50);
+                }, 300);
+                
+            } else {
+                btnSignup.classList.replace('text-gray-400', 'text-white');
+                btnSignup.classList.replace('border-transparent', 'border-white');
+                btnLogin.classList.replace('text-white', 'text-gray-400');
+                btnLogin.classList.replace('border-white', 'border-transparent');
+                
+                loginForm.classList.remove('opacity-100');
+                loginForm.classList.add('opacity-0');
+                setTimeout(() => {
+                    loginForm.classList.add('hidden');
+                    signupForm.classList.remove('hidden');
+                    setTimeout(() => {
+                        signupForm.classList.remove('opacity-0');
+                        signupForm.classList.add('opacity-100');
+                    }, 50);
+                }, 300);
+            }
+        }
+    </script>
+</body>
+</html>

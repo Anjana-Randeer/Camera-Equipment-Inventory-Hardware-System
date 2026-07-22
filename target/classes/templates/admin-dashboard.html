@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | CamRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .modal-glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); }
+        .category-card { 
+            background-size: cover; 
+            background-position: center; 
+            background-blend-mode: overlay;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="border-b border-gray-800 bg-gray-900/50 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold tracking-tight text-white">CamRent <span class="font-light text-gray-400">Admin</span></span>
+                </div>
+                <div>
+                    <a th:href="@{/logout}" class="text-gray-400 hover:text-white transition-colors text-sm font-medium">Log out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
+        
+        <!-- Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            
+            <!-- Cameras Card -->
+            <div class="category-card bg-gray-800 rounded-2xl p-6 shadow-xl h-48 flex flex-col justify-end group"
+                 style="background-image: url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop');">
+                <div class="bg-gradient-to-t from-gray-900 to-transparent absolute inset-0 rounded-2xl opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold text-white mb-1">Cameras</h3>
+                    <p class="text-gray-300 text-sm"><span th:text="${#lists.size(cameras)}" class="font-bold text-white text-lg">0</span> items</p>
+                </div>
+            </div>
+
+            <!-- Lenses Card -->
+            <div class="category-card bg-gray-800 rounded-2xl p-6 shadow-xl h-48 flex flex-col justify-end group"
+                 style="background-image: url('https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=800&auto=format&fit=crop');">
+                <div class="bg-gradient-to-t from-gray-900 to-transparent absolute inset-0 rounded-2xl opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold text-white mb-1">Lenses</h3>
+                    <p class="text-gray-300 text-sm"><span th:text="${#lists.size(lenses)}" class="font-bold text-white text-lg">0</span> items</p>
+                </div>
+            </div>
+
+            <!-- Accessories Card -->
+            <div class="category-card bg-gray-800 rounded-2xl p-6 shadow-xl h-48 flex flex-col justify-end group"
+                 style="background-image: url('https://images.unsplash.com/photo-1596706173024-f7fc4711df77?q=80&w=800&auto=format&fit=crop');">
+                <div class="bg-gradient-to-t from-gray-900 to-transparent absolute inset-0 rounded-2xl opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold text-white mb-1">Accessories</h3>
+                    <p class="text-gray-300 text-sm"><span th:text="${#lists.size(accessories)}" class="font-bold text-white text-lg">0</span> items</p>
+                </div>
+            </div>
+            
+            <!-- Customers Card -->
+            <div class="category-card bg-blue-900/40 rounded-2xl p-6 shadow-xl h-48 flex flex-col justify-end group border border-blue-800/50">
+                <div class="bg-gradient-to-t from-gray-900 to-transparent absolute inset-0 rounded-2xl opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold text-blue-400 mb-1">Customers</h3>
+                    <p class="text-gray-300 text-sm"><span th:text="${#lists.size(customers)}" class="font-bold text-white text-lg">0</span> registered</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-12 mb-4">
+            <h2 class="text-2xl font-bold text-white">Inventory Management</h2>
+            <button onclick="openModal()" class="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors shadow-lg flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <span>Add Equipment</span>
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="bg-gray-800/50 text-gray-400 border-b border-gray-800">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold">ID</th>
+                            <th class="px-6 py-4 font-semibold">Name / Brand</th>
+                            <th class="px-6 py-4 font-semibold">Type</th>
+                            <th class="px-6 py-4 font-semibold">Rental/Day</th>
+                            <th class="px-6 py-4 font-semibold">Status</th>
+                            <th class="px-6 py-4 font-semibold text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800/50">
+                        <tr th:each="item : ${equipments}" class="hover:bg-gray-800/20 transition-colors">
+                            <td class="px-6 py-4 font-mono text-gray-400" th:text="${item.equipmentId}">ID</td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-white" th:text="${item.equipmentName}">Name</div>
+                                <div class="text-xs text-gray-500" th:text="${item.brand}">Brand</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2.5 py-1 text-xs font-medium bg-gray-800 text-gray-300 rounded-full" th:text="${item.equipmentType}">Type</span>
+                            </td>
+                            
+                            <!-- Update Price Form -->
+                            <td class="px-6 py-4">
+                                <form th:action="@{/admin/equipment/price}" method="post" class="flex items-center space-x-2">
+                                    <input type="hidden" name="equipmentId" th:value="${item.equipmentId}">
+                                    <span class="text-gray-500">Rs.</span>
+                                    <input type="number" name="price" th:value="${item.rentalPerDay}" class="w-24 bg-black/40 border border-gray-700 rounded px-2 py-1 text-sm focus:outline-none focus:border-white text-white">
+                                    <button type="submit" class="text-blue-400 hover:text-blue-300 text-xs font-semibold">Update</button>
+                                </form>
+                            </td>
+
+                            <!-- Update Status Form -->
+                            <td class="px-6 py-4">
+                                <form th:action="@{/admin/equipment/status}" method="post" class="flex items-center space-x-2">
+                                    <input type="hidden" name="equipmentId" th:value="${item.equipmentId}">
+                                    <select name="status" class="bg-black/40 border border-gray-700 rounded px-2 py-1 text-sm focus:outline-none focus:border-white text-white" onchange="this.form.submit()">
+                                        <option value="AVAILABLE" th:selected="${item.equipmentStatus?.name() == 'AVAILABLE'}">Available</option>
+                                        <option value="RENTED" th:selected="${item.equipmentStatus?.name() == 'RENTED'}">Rented</option>
+                                        <option value="MAINTENANCE" th:selected="${item.equipmentStatus?.name() == 'MAINTENANCE'}">Maintenance</option>
+                                        <option value="RETIRED" th:selected="${item.equipmentStatus?.name() == 'RETIRED'}">Retired</option>
+                                    </select>
+                                </form>
+                            </td>
+
+                            <!-- Remove Action -->
+                            <td class="px-6 py-4 text-right">
+                                <form th:action="@{/admin/equipment/remove}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to remove this equipment?');">
+                                    <input type="hidden" name="equipmentId" th:value="${item.equipmentId}">
+                                    <button type="submit" class="text-red-500 hover:text-red-400 font-medium">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(equipments)}">
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">No equipment found in inventory.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Customers Table -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-white mb-6">Registered Customers</h2>
+            <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden shadow-2xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-gray-800/50 text-gray-400 border-b border-gray-800">
+                            <tr>
+                                <th class="px-6 py-4 font-semibold">NIC / ID</th>
+                                <th class="px-6 py-4 font-semibold">Name</th>
+                                <th class="px-6 py-4 font-semibold">Address</th>
+                                <th class="px-6 py-4 font-semibold">Contact No</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800/50">
+                            <tr th:each="cust : ${customers}" class="hover:bg-gray-800/20 transition-colors">
+                                <td class="px-6 py-4 font-mono text-gray-400" th:text="${cust.customerId}">ID</td>
+                                <td class="px-6 py-4 font-medium text-white" th:text="${cust.name}">Name</td>
+                                <td class="px-6 py-4 text-gray-300" th:text="${cust.address}">Address</td>
+                                <td class="px-6 py-4 text-gray-300" th:text="${cust.contactNo}">Contact No</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(customers)}">
+                                <td colspan="4" class="px-6 py-12 text-center text-gray-500">No customers registered yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Add Equipment Modal -->
+    <div id="addModal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg p-6 relative z-10 shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
+                
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white">Add New Equipment</h2>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Simplified Add Form for Demo -->
+                <form th:action="@{/admin/equipment/add}" method="post" class="space-y-4">
+                    <div class="flex space-x-4">
+                        <div class="w-1/2">
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Equipment ID</label>
+                            <input type="text" name="equipmentId" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Type</label>
+                            <select id="equipmentType" name="equipmentType" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white" onchange="toggleTypeFields()">
+                                <option value="CAMERA_BODY">Camera Body</option>
+                                <option value="CAMERA_LENS">Camera Lens</option>
+                                <option value="ACCESSORY">Accessory</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Name</label>
+                        <input type="text" name="equipmentName" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <div class="w-1/2">
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Brand</label>
+                            <input type="text" name="brand" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Purchase Price</label>
+                            <input type="number" step="0.01" name="purchasePrice" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Fields -->
+                    <div id="cameraFields" class="dynamic-field block">
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Model Name</label>
+                        <input type="text" name="model" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                    </div>
+
+                    <div id="lensFields" class="dynamic-field hidden">
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Zoom Range & Mount</label>
+                        <div class="flex space-x-2">
+                            <input type="text" name="zoomRange" placeholder="e.g. 50mm f/1.8" class="w-1/2 bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                            <input type="text" name="mountType" placeholder="e.g. Sony E" class="w-1/2 bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                        </div>
+                    </div>
+
+                    <div id="accessoryFields" class="dynamic-field hidden">
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Accessory Category</label>
+                        <select name="accessoryType" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                            <option value="FLASHLIGHT">Flash Light</option>
+                            <option value="GIMBAL_STABILIZER">Gimbal / Stabilizer</option>
+                            <option value="MIC">Microphone</option>
+                            <option value="TRIPOD">Tripod</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Rental Per Day (Rs.)</label>
+                        <input type="number" step="0.01" name="rentalPerDay" required class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 focus:border-white focus:outline-none text-white">
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-800">
+                        <button type="submit" class="w-full bg-white text-black font-semibold py-2.5 rounded-lg hover:bg-gray-200 transition-colors">Save Equipment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            const modal = document.getElementById('addModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.classList.add('opacity-100');
+                    if (modalContent) {
+                        modalContent.classList.remove('scale-95');
+                        modalContent.classList.add('scale-100');
+                    }
+                }, 10);
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('addModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            if (modal) {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-100');
+                    modalContent.classList.add('scale-95');
+                }
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function toggleTypeFields() {
+            const type = document.getElementById('equipmentType').value;
+            document.querySelectorAll('.dynamic-field').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            if (type === 'CAMERA_BODY') {
+                document.getElementById('cameraFields').classList.remove('hidden');
+                document.getElementById('cameraFields').classList.add('block');
+            } else if (type === 'CAMERA_LENS') {
+                document.getElementById('lensFields').classList.remove('hidden');
+                document.getElementById('lensFields').classList.add('block');
+            } else {
+                document.getElementById('accessoryFields').classList.remove('hidden');
+                document.getElementById('accessoryFields').classList.add('block');
+            }
+        }
+    </script>
+</body>
+</html>
