@@ -2,11 +2,7 @@
 
 > A web-based inventory and rental management system for tracking camera bodies, lenses, and accessories — built as a group project for \\\*\\\*CSC 2032: Object-Oriented Programming\\\*\\\*.
 
-!\[Java](https://img.shields.io/badge/Java-Spring%20Boot-red?logo=spring\&logoColor=white)
-!\[MySQL](https://img.shields.io/badge/Database-MySQL-blue?logo=mysql\&logoColor=white)
-!\[Frontend](https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange?logo=javascript)
-!\[Status](https://img.shields.io/badge/Status-Academic%20Project-lightgrey)
-!\[License](https://img.shields.io/badge/License-Educational%20Use-yellow)
+
 
 \---
 
