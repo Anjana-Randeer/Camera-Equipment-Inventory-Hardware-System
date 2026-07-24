@@ -72,7 +72,7 @@
 
 # 
 
-# \## 👥 Contributors
+# \## 👥 Group Members
 
 # 
 
